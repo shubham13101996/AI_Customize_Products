@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import state from "../store";
+import axios from "axios";
 import config from "../config/config";
 import { download } from "../assets";
 import { reader, downloadCanvasToImage } from "../config/helpers";
@@ -54,6 +55,21 @@ const Customizer = () => {
 
     try {
       // call the backend to generate the image
+
+      setGeneratingImg(true);
+
+      const response = await axios(process.env.REACT_APP_API, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          prompt,
+        }),
+      });
+
+      const data = await response.json();
+      handleDecals(type, `data:image/png;base64,${data.photo}`);
     } catch (err) {
       alert("err");
     } finally {
@@ -89,6 +105,7 @@ const Customizer = () => {
       default:
         state.isLogoTexture = true;
         state.isFullTexture = false;
+        break;
     }
 
     // after setting the state ,activeFilterTab is updated
